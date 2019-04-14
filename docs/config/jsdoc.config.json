@@ -1,0 +1,9 @@
+{
+  "source": {
+    "include": ["./lobby"]
+  },
+  "opts": {
+    "destination": "./docs",
+    "recurse": true
+  }
+}
