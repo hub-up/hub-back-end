@@ -1,6 +1,6 @@
 {
   "source": {
-    "include": ["./lobby"]
+    "include": ["./server.js"]
   },
   "opts": {
     "destination": "./docs",
