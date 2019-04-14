@@ -2,10 +2,10 @@
   "name": "hub-back-end",
   "version": "0.0.1",
   "description": "",
-  "main": "lobby/server.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node lobby/server.js",
-    "watch": "nodemon lobby/server.js",
+    "start": "node server.js",
+    "watch": "nodemon server.js",
     "lint": "eslint '**/*.js'",
     "test": "jest --coverage --verbose",
     "test-watch": "jest --coverage --verbose --watch"
