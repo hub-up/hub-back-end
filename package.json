@@ -1,0 +1,32 @@
+{
+  "name": "hub-back-end",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "watch": "nodemon index.js",
+    "lint": "eslint '**/*.js'",
+    "test": "jest --coverage --verbose",
+    "test-watch": "jest --coverage --verbose --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hub-up/hub-back-end.git"
+  },
+  "keywords": [],
+  "author": "Hubba Hubba",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hub-up/hub-back-end/issues"
+  },
+  "homepage": "https://github.com/hub-up/hub-back-end#readme",
+  "dependencies": {
+    "socket.io": "^2.2.0"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.0.1",
+    "eslint": "^5.16.0",
+    "jest": "^24.7.1"
+  }
+}
