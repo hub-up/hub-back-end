@@ -28,8 +28,8 @@ io.on('connection', socket => {
     const usersList = Object.keys(users);
     const usersNum = usersList.length;
     const usersDisplay = usersList.filter(name => name !== username);
-    const namespace = null;
-    const payload = { namespace, socketId, username, usersDisplay, usersNum };
+    const room = 'Lobby';
+    const payload = { room, socketId, username, usersDisplay, usersNum };
     io.to(socketId).emit('details-io', payload);
   });
 
@@ -49,6 +49,11 @@ io.on('connection', socket => {
     socket.broadcast.emit('emote-io', payload.message);
   });
 
+  //Test
+  socket.on('speak', payload => {
+    socket.emit('say hi', payload);
+  });
+
   // A user logs in
   socket.on('login', payload => {
     const { id } = socket;
@@ -58,6 +63,13 @@ io.on('connection', socket => {
     socket.broadcast.emit('login-io', payload);
     // Update the new user object with the socketId
     io.to(id).emit('login-update-io', id);
+  });
+
+  //User Joins a room
+  socket.on('join', payload => {
+    console.log('Somebody joined ', payload.room);
+    socket.join(`${payload.room}`);
+    io.to(payload.user.socketId).emit('join-io', payload.room);
   });
 
   // A user tries to update their username
@@ -87,5 +99,5 @@ io.on('connection', socket => {
       // TODO
       console.log('SEND AN ERROR MESSAGE TO THE SENDER');
     }
-  });
+  }); 
 });
