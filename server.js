@@ -6,9 +6,32 @@
  ***/
 
 /*** IMPORTS AND INITIALIZATION ***/
+// Express
+const express = require('express');
+const app = express();
+
+// Socket.io
+const server = require('http').Server(app);
+const io = require('socket.io')(server);
+
 const PORT = process.env.PORT || 3000;
-const io = require('socket.io')(PORT);
-console.log(`Socket.io server running on port ${PORT}...`);
+
+app.get('/', (req, res) => {
+  res
+    .status(200)
+    .send(
+      'Welcome to the Hubbub server!\nDownload the client at https://github.com/hub-up/hub-front-end'
+    );
+});
+
+server.listen(PORT, err => {
+  if (err) {
+    console.error('There was an error starting the server...');
+  } else {
+    console.log(`You are connected to the Express server on port ${PORT}...`);
+    console.log(`Socket.io server up and running!`);
+  }
+});
 
 /*** LIST OF USERNAMES WITH CORRESPONDING SOCKET IDS ***/
 const users = {};
