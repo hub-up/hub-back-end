@@ -24,6 +24,7 @@
   "homepage": "https://github.com/hub-up/hub-back-end#readme",
   "dependencies": {
     "dotenv": "^7.0.0",
+    "express": "^4.16.4",
     "socket.io": "^2.2.0"
   },
   "devDependencies": {
