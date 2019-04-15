@@ -1,7 +1,7 @@
 'use strict';
 
 const events = io => {
-  /*** LIST OF USERNAMES WITH CORRESPONDING SOCKET IDS ***/
+  /*** LIST OF ROOMS, USERNAMES WITH CORRESPONDING SOCKET IDS ***/
   const users = {};
 
   /*** SERVER EVENT HANDLERS ***/
@@ -10,7 +10,7 @@ const events = io => {
 
     // A regular chat message
     socket.on('chat', payload => {
-      socket.broadcast.emit('chat-io', payload);
+      socket.to(payload.room).emit('chat-io', payload);
     });
 
     // A user requests details
@@ -19,8 +19,8 @@ const events = io => {
       const usersList = Object.keys(users);
       const usersNum = usersList.length;
       const usersDisplay = usersList.filter(name => name !== username);
-      const namespace = null;
-      const payload = { namespace, socketId, username, usersDisplay, usersNum };
+      const room = user.room;
+      const payload = { room, socketId, username, usersDisplay, usersNum };
       io.to(socketId).emit('details-io', payload);
     });
 
@@ -30,25 +30,42 @@ const events = io => {
 
     // A user disconnects
     // This event sends a disconnection message back to the client
-    socket.on('disconnect-start', payload => {
-      delete users[payload.username];
-      socket.broadcast.emit('disconnect-io', payload);
+    socket.on('disconnect-start', user => {
+      socket.to(user.room).emit('disconnect-io', user);
+      delete users[user.username];
     });
 
     // A user sends an emote
     socket.on('emote', payload => {
-      socket.broadcast.emit('emote-io', payload.message);
+      socket.to(payload.room).emit('emote-io', payload.message);
+    });
+
+    // A user leaves a room and returns to the lobby
+    socket.on('leave', payload => {
+      // Leave a room and announce
+      socket.leave(payload.room);
+      io.to(payload.room).emit('room-leave-io', payload);
+      // Join another and announce
+      socket.join('lobby');
+      socket.to(payload.newRoom).emit('room-join-io', payload);
+      // Update the user object
+      io.to(socket.id).emit('room-join-update-io', payload.room);
+      // TODO: If a user is in the lobby, they can't leave
     });
 
     // A user logs in
     socket.on('login', payload => {
       const { id } = socket;
+      const room = 'lobby';
       const { username } = payload;
       users[username] = id;
-      // Announce the login
-      socket.broadcast.emit('login-io', payload);
+      // Join the lobby
+      socket.join(room);
+      // Announce the login to the room
+      socket.to(room).emit('login-io', payload);
       // Update the new user object with the socketId
-      io.to(id).emit('login-update-io', id);
+      const update = { id, room };
+      io.to(id).emit('login-update-io', update);
     });
 
     // A user tries to update their username
@@ -61,7 +78,7 @@ const events = io => {
         // Send an update event to the user
         io.to(id).emit('nick-update-io', { username: newNick });
         // Announce to everyone else
-        socket.broadcast.emit('nick-io', { message: payload.message });
+        socket.to(payload.room).emit('nick-io', { message: payload.message });
       } else {
         // No duplicates allowed
         io.to(id).emit('nick-update-failed-io', { username: newNick });
@@ -78,6 +95,20 @@ const events = io => {
         // TODO
         console.log('SEND AN ERROR MESSAGE TO THE SENDER');
       }
+    });
+
+    // A user wants to join a different room
+    socket.on('room', payload => {
+      // Announce the user's departure
+      socket.to(payload.room).emit('room-leave-io', payload);
+      socket.leave(payload.room);
+      // Announce the user
+      socket.join(payload.newRoom);
+      socket.to(payload.newRoom).emit('room-join-io', payload);
+      // Update the user's information
+      io.to(payload.user.socketId).emit('room-join-update-io', payload);
+      // TODO: If a room already exists, the user gets an error.
+      // They should use the `join` command to join an existing room.
     });
   });
 };
