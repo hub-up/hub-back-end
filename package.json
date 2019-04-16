@@ -2,10 +2,10 @@
   "name": "hub-back-end",
   "version": "0.0.1",
   "description": "",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node server.js",
-    "watch": "nodemon server.js",
+    "start": "node index.js",
+    "watch": "nodemon index.js",
     "lint": "eslint '**/*.js'",
     "test": "jest --coverage --verbose",
     "test-watch": "jest --coverage --verbose --watch",
@@ -25,12 +25,14 @@
   "dependencies": {
     "dotenv": "^7.0.0",
     "express": "^4.16.4",
+    "morgan": "^1.9.1",
     "socket.io": "^2.2.0"
   },
   "devDependencies": {
     "babel-eslint": "^10.0.1",
     "eslint": "^5.16.0",
     "jest": "^24.7.1",
-    "jsdoc": "^3.5.5"
+    "jsdoc": "^3.5.5",
+    "supertest": "^4.0.2"
   }
 }
