@@ -25,7 +25,9 @@ const events = io => {
 
     // A user disconnects
     // This event actually kills the socket
-    socket.on('disconnect', () => {});
+    socket.on('disconnect', () => {
+      console.log('Disconnecting user:', socket.id);
+    });
 
     // A user disconnects
     // This event sends a disconnection message back to the client
