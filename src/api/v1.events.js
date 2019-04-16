@@ -32,12 +32,22 @@ const events = io => {
     // This event sends a disconnection message back to the client
     socket.on('disconnect-start', user => {
       socket.to(user.room).emit('disconnect-io', user);
-      delete users[user.username];
+      // Case insensitive update
+      const lowercased = user.username.toLowerCase();
+      delete users[lowercased];
     });
 
     // A user sends an emote
     socket.on('emote', payload => {
       socket.to(payload.room).emit('emote-io', payload.message);
+    });
+
+    // Duplicate username check before login
+    // Check should be case insensitive
+    socket.on('is-duplicate', username => {
+      const lowercased = username.toLowerCase();
+      const response = users[lowercased] ? true : false;
+      io.to(socket.id).emit('is-duplicate-io', response);
     });
 
     // A user leaves a room and returns to the lobby
@@ -58,7 +68,9 @@ const events = io => {
       const { id } = socket;
       const room = 'lobby';
       const { username } = payload;
-      users[username] = id;
+      // Store the username in lowercase
+      const lowercased = username.toLowerCase();
+      users[lowercased] = id;
       // Join the lobby
       socket.join(room);
       // Announce the login to the room
@@ -70,18 +82,21 @@ const events = io => {
 
     // A user tries to update their username
     socket.on('nick', payload => {
-      const { oldNick, newNick } = payload;
       const { id } = socket;
-      if (!users[newNick]) {
-        users[newNick] = id;
-        delete users[oldNick];
+      const { oldNick, newNick } = payload;
+      // Case insensitive
+      const lowercasedOldNick = oldNick.toLowerCase();
+      const lowercasedNewNick = newNick.toLowerCase();
+      if (!users[lowercasedNewNick]) {
+        users[lowercasedNewNick] = id;
+        delete users[lowercasedOldNick];
         // Send an update event to the user
         io.to(id).emit('nick-update-io', { username: newNick });
         // Announce to everyone else
         socket.to(payload.room).emit('nick-io', { message: payload.message });
       } else {
         // No duplicates allowed
-        io.to(id).emit('nick-update-failed-io', { username: newNick });
+        io.to(id).emit('nick-update-failed-io');
       }
     });
 
