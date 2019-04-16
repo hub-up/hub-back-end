@@ -7,7 +7,6 @@ const events = io => {
   /*** SERVER EVENT HANDLERS ***/
   io.on('connection', socket => {
     console.log(`Socket connected with id ${socket.id}...`);
-
     // A regular chat message
     socket.on('chat', payload => {
       socket.to(payload.room).emit('chat-io', payload);
