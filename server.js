@@ -14,7 +14,7 @@ const app = express();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3333;
 
 app.get('/', (req, res) => {
   res
@@ -58,7 +58,9 @@ io.on('connection', socket => {
 
   // A user disconnects
   // This event actually kills the socket
-  socket.on('disconnect', () => {});
+  socket.on('disconnect', () => {
+    console.log('disconnected');
+  });
 
   // A user disconnects
   // This event sends a disconnection message back to the client
