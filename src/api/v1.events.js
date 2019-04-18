@@ -10,17 +10,20 @@ const events = io => {
 
     // A regular chat message
     socket.on('chat', payload => {
+      console.log('payload-chat: ', payload);
       socket.to(payload.room).emit('chat-io', payload);
     });
 
     // A user requests details
     socket.on('details', user => {
       const { socketId, username } = user;
+      console.log('socketId: ', socketId);/////
       const usersList = Object.keys(users);
       const usersNum = usersList.length;
       const usersDisplay = usersList.filter(name => name !== username);
       const room = user.room;
       const payload = { room, socketId, username, usersDisplay, usersNum };
+      console.log('payload-details: ', payload);///////
       io.to(socketId).emit('details-io', payload);
     });
 
@@ -67,6 +70,7 @@ const events = io => {
 
     // A user logs in
     socket.on('login', payload => {
+      console.log('payloadBEFORE: ', payload);////////////
       const { id } = socket;
       const room = 'lobby';
       const { username } = payload;
