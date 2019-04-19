@@ -3,21 +3,21 @@
 const events = io => {
   /*** LIST OF ROOMS, USERNAMES WITH CORRESPONDING SOCKET IDS ***/
   const users = {};
-
+  
   /*** SERVER EVENT HANDLERS ***/
   io.on('connection', socket => {
     console.log(`Socket connected with id ${socket.id}...`);
-
+    
     // A regular chat message
     socket.on('chat', payload => {
       console.log('payload-chat: ', payload);
       socket.to(payload.room).emit('chat-io', payload);
     });
-
+    
     // A user requests details
     socket.on('details', user => {
       const { socketId, username } = user;
-      console.log('socketId: ', socketId);/////
+      console.log('USER: ', user);/////
       const usersList = Object.keys(users);
       const usersNum = usersList.length;
       const usersDisplay = usersList.filter(name => name !== username);
