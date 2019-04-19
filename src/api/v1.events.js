@@ -17,13 +17,13 @@ const events = io => {
     // A user requests details
     socket.on('details', user => {
       const { socketId, username } = user;
-      console.log('USER: ', user);/////
       const usersList = Object.keys(users);
       const usersNum = usersList.length;
       const usersDisplay = usersList.filter(name => name !== username);
       const room = user.room;
       const payload = { room, socketId, username, usersDisplay, usersNum };
       console.log('payload-details: ', payload);///////
+      console.log('SOCKETID: ', socketId);
       io.to(socketId).emit('details-io', payload);
     });
 
@@ -121,13 +121,19 @@ const events = io => {
     // A user wants to join a different room
     socket.on('room', payload => {
       // Announce the user's departure
+      console.log('payloadFORROOM: ', payload);///////
       socket.to(payload.room).emit('room-leave-io', payload);
       socket.leave(payload.room);
       // Announce the user
       socket.join(payload.newRoom);
       socket.to(payload.newRoom).emit('room-join-io', payload);
       // Update the user's information
-      io.to(payload.user.socketId).emit('room-join-update-io', payload);
+      console.log('hit: ', payload.socketId);
+      let socketId = payload.socketId;
+      console.log(socketId);
+      io.to(payload.socketId).emit('room-join-update-io', payload);
+      io.to(payload.socketId).emit('details-io', payload);
+      // io.to(payload.user.socketId).emit('room-join-update-io', payload);
       // TODO: If a room already exists, the user gets an error.
       // They should use the `join` command to join an existing room.
     });

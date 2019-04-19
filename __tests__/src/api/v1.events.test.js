@@ -47,40 +47,29 @@ describe('manage each socket connection and disconnection', () => {
     } else {
       console.log('THERE IS NO CONNECTION TO TERMINATE');
     }
-    socket.close();//disconnects the socket when all tests are completed
     done();//declares finished
-    io_server.close();//closes the server when all tests are completed
+    socket.close();//disconnects the socket when all tests are completed
   });
   
   
   //tests for actual events
   describe('events handler', () => {
     
+
+    //WORKS
     xit('should return with a new user payload on login', (done) => {
       let client1 = io.connect(socketURL, options);
-      // console.log(client1);//is the socket
-      client1.on('connect', (payload) => {
-        console.log('hit1');
-        payload = {message: '', username: chatUser1 };
+      client1.on('connect', () => {
+        let payload = {message: '', username: chatUser1 };
         client1.emit('login', payload);
-        console.log('hit2');
-        //upper part of this test works. lower part does not
-        io_server.emit('login', events.payload);
-        socket.on('login', (payload) => {
-          console.log('payloadHIT: ', payload);
-          expect(payload.username).toBe('AARON');
+
+        client1.on('login-update-io', (payload) => {
+
+          expect(payload.username).toBe(undefined);
           expect(payload.messsage).toBe('');
           expect(payload.room).toBe('lobby');
         });
       });
-      // client1.emit('login', payload);
-      // console.log(payload);
-      // client1.on('login-io', (payload) => {//not hitting this
-      //   console.log('hit again');
-      //   expect(payload.username).toBe('AARON');
-      //   expect(payload.message).toBe('');
-      // });
-      // console.log('loginClient: ', payload);
       done();
     });
     
@@ -112,9 +101,41 @@ describe('manage each socket connection and disconnection', () => {
       });
       done();
     });
+     
+    //needs work
+    xit('should allow a user to enter a new room', (done) => {
+      let client1 = socket;
+      let payload = {message: '', username: chatUser1, room: 'lobby'};
+      client1.emit('login', payload);
+      console.log('client1: ', client1.id);
+      payload = {username: chatUser1, socketId: client1.id, room: 'lobby'};
+      client1.emit('room', payload);
+      console.log('hIT');
+      client1.on('details-io' ,(payload) => {
+      // client1.on('room-join-update-io', (payload) => {
+        console.log('payload.room: ', payload);
+      });
+      done();
+    });
+
+    
+    //DOESNT WORK YET
+    xit('should return an emote', (done) => {
+      let client1 = socket;
+      let payload = {message: '', username: chatUser1, room: 'lobby'};
+      client1.emit('login', payload);
+      // console.log('payload: ', payload);
+      // console.log('socketID: ', client1.id);
+      client1.emit('emote', payload);
+      client1.on('emote-io', (payload) => {
+        console.log('payload,emote: ', payload);
+      });
       
-      
-      
+
+
+      done();
+    });
+    
       
   });
 });
